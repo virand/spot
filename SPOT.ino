@@ -1,20 +1,18 @@
-// ВАЖНО! У каждого устройства свой уникальный ID
-#define DEVICE_ID 1
-#define URL_FOR_REQUESTS "http://176.53.223.177:10080/spot/sendValue.php?deviceId="
-#define WIFI_SSID "VIRAND.RU"
-#define WIFI_PASSWORD "2329292hex"
+#define DEVICE_ID 1 // ВАЖНО! У каждого устройства свой уникальный ID
+#define URL_FOR_REQUESTS "http://176.53.223.177:10080/spot/sendValue.php?deviceId=" // ВАЖНО! У каждого устройства свой уникальный ID
+#define WIFI_SSID "VIRAND.RU" // Имя Wi-Fi сети
+#define WIFI_PASSWORD "2329292hex" // Пароль Wi-Fi сети
 
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include <ESP8266HTTPClient.h>
-
 #define USE_SERIAL Serial
 
 ESP8266WiFiMulti WiFiMulti;
 
-unsigned int triggerValue=0;
 
+unsigned int triggerValue=0;
 unsigned long Time_Echo_us = 0;
 unsigned long Len_mm_X100 = 0;
 unsigned long Len_Integer = 0; 
@@ -23,11 +21,11 @@ boolean connectionEstablished=false;
 boolean ultrasonicConnected=false;
 //Len_mm_X100 = length*100
 
-unsigned int EchoPin = 16;
-unsigned int TrigPin = 5;
-unsigned int PowerPin = 15;
-unsigned int NetworkPin = 4;
-unsigned int CarIsPresentPin = 0;
+unsigned int EchoPin = 16; // Пин для ультразвукового датчика
+unsigned int TrigPin = 5; // Пин для ультразвукового датчика
+unsigned int PowerPin = 15; // Пин светодиода питания
+unsigned int NetworkPin = 4; // Пин светодиода наличия сети
+unsigned int CarIsPresentPin = 0; // Пин светодиода наличия машины
 
 
 void setup(){
@@ -53,9 +51,6 @@ void setup(){
 
   WiFiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
 }
-
-
-
 
 // Возвращает расстояние между датчиком и поверхностью
 unsigned int getDistance(){
@@ -83,7 +78,6 @@ if((Time_Echo_us < 60000) && (Time_Echo_us > 1)){
   {
     ultrasonicConnected=false;
   }
-  
 
   return distance;
 }
@@ -138,26 +132,24 @@ unsigned int makeRequest(unsigned int distance){
             USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
             connectionEstablished=false;
         }
-
         http.end();
     }
 
     return triggerValue;
 }
 
-
-
 void loop(){
   unsigned int distance = 0;
   distance = getDistance();
   triggerValue=makeRequest(distance);
 
+  
   if(connectionEstablished)
   {
-      digitalWrite(NetworkPin, HIGH);
+      digitalWrite(NetworkPin, HIGH); // Если есть соединениеЮ то включаем соответствующий светодиод
       if (distance<triggerValue && ultrasonicConnected)
       {
-        digitalWrite(CarIsPresentPin, HIGH);
+        digitalWrite(CarIsPresentPin, HIGH); // Если есть соединение и расстояние между датчиком и поверхностью меньше заданного, то включаем светодиод наличия машины
       }
       else{
         digitalWrite(CarIsPresentPin, LOW);
@@ -168,10 +160,5 @@ void loop(){
       digitalWrite(NetworkPin, LOW);
       digitalWrite(CarIsPresentPin, LOW);
   }
-
-
-  
-
-
   delay(1000);
 }
