@@ -90,13 +90,13 @@ unsigned int makeRequest(unsigned int distance){
 
   unsigned int triggerValue=0;
   
-   // wait for WiFi connection
+   // Если есть соединение с Wi-Fi, то выполняем ниже указанный код
     if((WiFiMulti.run() == WL_CONNECTED)) {
 
         HTTPClient http;
 
         USE_SERIAL.print("[HTTP] begin...\n");
-        // configure traged server and url
+        // Конфигурируем запрос для сервера
         //http.begin("https://192.168.1.12/test.html", "7a 9c f4 db 40 d3 62 5a 6e 21 bc 5c cc 66 c8 3e a1 45 59 38"); //HTTPS
         char url[120];
         strcpy(url, URL_FOR_REQUESTS);
@@ -112,15 +112,15 @@ unsigned int makeRequest(unsigned int distance){
         http.begin(url); //HTTP
 
         USE_SERIAL.print("[HTTP] GET...\n");
-        // start connection and send HTTP header
+        // Начать соединение и отправить HTTP header
         int httpCode = http.GET();
 
-        // httpCode will be negative on error
+        // httpCode будет отрицательным при ошибке
         if(httpCode > 0) {
-            // HTTP header has been send and Server response header has been handled
+            // HTTP header был отправлен и сервер ответил, что заголовок был обработан
             USE_SERIAL.printf("[HTTP] GET... code: %d\n", httpCode);
 
-            // file found at server
+            // Файл найден на сервере
             if(httpCode == HTTP_CODE_OK) {
                 String payload = http.getString();
                 USE_SERIAL.print("[PAGE_CONTENT]: ");
@@ -146,7 +146,7 @@ void loop(){
   
   if(connectionEstablished)
   {
-      digitalWrite(NetworkPin, HIGH); // Если есть соединениеЮ то включаем соответствующий светодиод
+      digitalWrite(NetworkPin, HIGH); // Если есть соединение, то включаем соответствующий светодиод
       if (distance<triggerValue && ultrasonicConnected)
       {
         digitalWrite(CarIsPresentPin, HIGH); // Если есть соединение и расстояние между датчиком и поверхностью меньше заданного, то включаем светодиод наличия машины
